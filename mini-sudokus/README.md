@@ -1,5 +1,5 @@
 # An Assembler Solver for Mini-Sudoku's
-!(A mini sudoku)[microsudoku.jpg]
+![A mini sudoku](microsudoku.jpg)
 
 A mini-sudoku is basically a simplified sudoku with 4x4 cells as seen in above Figure
 Every column, row and 2x2 house has to contain the digits 1-4. In this case the
