@@ -1,0 +1,1251 @@
+;===================================================================
+;Start-Adresse der Subroutinen und IRQ-Behandlungs-Routine
+progAddr = $3900
+;===================================================================
+
+;===================================================================
+;Daten der FIFO
+_fifoSize = 255		;Max. 255
+_fifoAddr = progAddr + $500	;Startadr der FIFO und Verwaltungsinformationen
+;===================================================================
+
+
+;===================================================================
+;Timer-Variablen
+;---------------
+_TimerLL = $88
+_TimerUL = $13
+;===================================================================
+
+
+;===================================================================
+;Masken für das CRB-Register
+;---------------------------
+_serCRB1Edge 	= %00000010
+_serCB2Set 		= %00001000
+_serCB2Del		= %11110111
+;===================================================================
+
+;===================================================================
+;Masken für die einzelnen Flags von _serFlags
+;--------------------------------------------
+_serSetCB1 = 	%00000001	;Bit 0 -> Status Flag der Leitung CB1
+_serDelCB1 = 	%11111110
+_serRcvEn = 	%00000010 	;Bit 1 -> Empfangsmodus Freigabe
+_serRcvDis =	%11111101	;Bit 1 -> Empfangsmodus deaktivieren
+_serRcvAct  = 	%00000100 	;Bit 2 -> Empfangsmodus aktiv
+_serRcvNAct =	%11111011	;Bit 2 -> Empfangsmodus deaktivieren
+_serSndAct = 	%00001000 	;Bit 3 -> Sendemodus aktiv
+_serSndNAct =	%11110111	;Bit 3 -> Sendemodus deaktivieren
+_serStartbit = 	%00010000 	;Bit 4 -> StartBit
+_serStopbit = 	%00100000	;Bit 5 -> StopBit
+_serParity = 	%01000000	;Bit 6 -> Parität
+_serErrFlg =	%10000000	;Bit 7 -> Fehlerkennung (1 -> Fehler)		
+;===================================================================	
+
+;===================================================================
+;Masken für _serSpecFlags
+_serSpecLine = %00000001	;Bit 0 -> Verwende Leitung 0 des Port B
+;===================================================================
+
+_serPatternLen = 11			;Länge der Folge
+
+_serPauseT = 255			;Anzahl an Schleifendurchläufe für Tw
+
+
+;===================================================================
+;User-IRQ Vektor für den IRQ A, der vom Anwender umgebogen wird
+UIRQAVek = $30	
+
+;Der Timer-Interrupt kann vom Anwender genutzt werden, wenn kein
+;Sendevorgang und kein Empfangsvorgang aktiv ist. Nach einem
+;Sende- bzw Empfangsvorganges müsssen CMCR, LL und UL vom Anwender
+;neu beschrieben werden. Die Nutzung sollte daher nur dann 
+;stattfinden, wenn gewährleistet ist, dass kein Sende-/
+;Empfangsvorgang gestartet werden kann. Wie UIRQAVek muss auch 
+;dieser Vektor zuvor vom Anwender umgebogen werden!
+UIRQTVek = $32
+;===================================================================
+
+;===================================================================
+	
+	.ORG progAddr
+;===================================================================
+;kritische Bereiche??
+;nur Akku wird verändert
+;Parameter: 
+;	0 		-> Löschen aller Einstellungen der ser. Schnittstelle
+;	1 		-> Senden erlauben / jedoch den Empfang verbieten
+;	sonst 	-> Senden sowie Empfang erlauben
+;	MSB = 1 -> Verwendung von Leitung 0 des PORT B als Eingang
+;===================================================================
+SPSIni:			
+	;Prüfe, ob MSB gesetzt -> Leitung 0 des PORT B verwenden 
+	PHA				;BIT-Befehl nicht möglich, dh. Sichern
+	LDA #0
+	;Setze Timer zurück
+	STA CMCR
+	LDA CRB
+	AND #%11000100
+	STA CRB
+	PLA
+	PHA
+	AND #$80
+	BEQ _SPSIni1
+	
+	;MSB war gesetzt, dh. Pin 0 des PORT B als Eingang verwenden
+	LDA CRB
+	AND #%11111011  	;Zugriff auf DDRB
+	STA CRB                   
+	
+	LDA DDRB			;Lade Datenrichtungsregister
+	AND #%11111110		;Pin 0 als Eingang schalten
+	STA DDRB
+	
+	LDA CRB
+	ORA #%00000100  	;Jetzt wieder Zugriff auf DRB
+	STA CRB
+	
+	LDA _serSpecFlags
+	ORA #_serSpecLine		;Verwendung von Pin 0 festhalten
+	STA _serSpecFlags
+	
+_SPSIni1:
+	PLA					;Parameter zurücksichern
+
+	;Lösche MSB
+	AND #$7F			;Frage Akku ab (N,Z-Flags setzen)
+	BEQ _SPSIniReset	;Bei Parameter == 0 ,alles Zurücksetzen
+	PHA					;Parameter auf den Stack sichern
+	
+	SEI
+	;Verbiegen des UserIRQ-Vektor
+	LDA #<_USR_IRQ
+	STA UIRQVek
+	LDA #>_USR_IRQ
+	STA UIRQVek+1
+	
+	;CB2 als Ausgang, CB2 := CRB.3
+	;CB1 als Eingang, fallende Flanke
+	LDA #%00111101	
+	STA CRB
+	LDA DRA
+	LDA DRB
+	LDA SL
+	CLI
+	
+	;Freigabe für Empfang zunächst setzen
+	LDA _serFlags
+	ORA #_serRcvEn
+	STA _serFlags
+	
+	PLA					;hole Parameter vom Stack
+	CMP #1
+	BNE _SPSIniEnd 		;Wenn Parameter != 1, verlasse Routine
+	
+	;blockiere Empfang wenn Parameter == 1
+	;EN-Flag löschen
+	LDA _serFlags
+	AND #_serRcvDis
+	STA _serFlags
+	BNE _SPSIniEnd
+
+_SPSIniReset:
+	;Setze alle Einstellungen zurück
+	;User-Interrupt Vektor zurücksetzen???
+	SEI
+	LDA #<IRQEnde
+	STA UIRQVek
+	LDA #>IRQEnde
+	STA UIRQVek + 1
+	LDA #0
+	;Setze Timer zurück
+	STA CMCR
+	LDA DRA
+	LDA DRB
+	LDA SL
+	CLI
+	
+	LDA #0
+	;Spezielle Flags zurücksetzen
+	STA _serSpecFlags
+	
+	;CountBits zurücksetzen
+	STA _serCountBits
+	
+	;Puffer zurücksetzen
+	STA _serBuf
+	STA _serBuf + 1
+	
+	;CB2 als Eingang, keine Freigabe
+	;CB1 als Eingang, keine Freigabe
+	;Zugriff auf DRB festlegen
+	ORA #%000001000
+	STA CRB
+	
+	;Flags zurücksetzen
+	LDA #1
+	STA _serFlags
+	
+_SPSIniEnd:
+	RTS
+;-------------------------------------------------------------------
+	
+
+;===================================================================
+;Diese Subroutine prüft, ob die SPS ein Datenbyte übertragen möchte und empfängt dieses
+;ggfs. Der Durchlauf der Subroutine kann bis zu 500ms dauern. Daher sollte diese Routine
+;nur bei Bedarf verwendet werden.
+;===================================================================
+receiveCheck:
+	PHA
+	
+	TYA
+	PHA
+
+	TXA
+	PHA
+
+	LDA #2
+	JSR SPSIni
+	
+	LDY #$FF
+receiveChecklop1:
+	NOP
+	LDX #$FF
+receiveChecklop2:
+	NOP
+	NOP
+	NOP
+	DEX
+	BNE receiveChecklop2
+
+	LDA _serFlags			;Prüfen, ob Empfang inzwischen aktiv geworden ist
+	AND #_serRcvAct
+	BNE receiveChecklop3		;Wenn ja, verlasse Warteschleife schon jetzt
+
+	DEY
+	BNE receiveChecklop1
+
+receiveChecklop3:
+	LDA _serFlags
+	AND #_serRcvAct
+	BNE receiveChecklop3
+	
+;.................Delay after receive...................................
+;Da mit SPSIni die Interrupts kurzzeitig gesperrt werden würde ohne
+;das Delay der Status der CB1 Leitung via IRQ nicht nachgeführt!
+	LDY #$7F
+Wait02:
+	LDX #$FF
+Wait01:
+	NOP
+	NOP
+	NOP
+	DEX
+	BNE Wait01
+	DEY
+	BNE Wait02
+;............................................................................
+
+	LDA #1			;Nur senden freigeben, CB2 bleibt auf 1!
+	JSR SPSIni
+
+	PLA
+	TAX ;X-Register rücksichern
+
+	PLA
+	TAY ;Y-Register rücksichern
+	
+	PLA ;Akku rücksichern
+
+	RTS
+;-------------------------------------------------------------------
+
+;===================================================================
+;Senden eines Bytes
+;Parameter: 
+;	im Akku -> Datenbyte
+;	im X - Register -> Warte auf KP(0), Nicht warten(sonst)
+;Rückgabewert im X-Register:
+;	0 -> kein Fehler
+;	1 -> Fehler vom Empfänger erkannt
+;	2 -> Noch selbst im Empfangsmodus
+;	3 -> Fehler vom Empfänger erkannt bzw. vorzeitige Beendigung
+;		des Sendevorganges (Empfänger wechselt nicht in den
+;		Empfangsmodus
+;===================================================================
+SPSAus:
+	;sichere Akku auf den Stack, der Wert soll später noch
+	;verfügbar sein
+	PHA
+	
+;Warte darauf, dass der Empfangsvorgang abgeschlossen ist. Dies
+;muss beachtet werden, da der Empfang im Hintergrund läuft...
+_SPSAus1:
+	NOP
+	LDA _serFlags
+	AND #_serRcvAct
+	;Weiter, wenn nicht im Empfangsmodus
+	BEQ _SPSAus2
+	TXA
+	;Warte, wenn X-Register = 0
+	BEQ _SPSAus1
+	
+	;Breche mit Fehlermeldung 2 ab
+	LDX #2
+	JMP _SPSAusEnde
+	
+	;Warte darauf, dass der Kommunikationspartner seine
+	;Sende-Leitung wieder auf 1 setzt
+_SPSAus2:
+	NOP
+	
+	;Wenn Pin 0 von PORT B verwendet wird, dann lese den aktuellen
+	;Zustand der Leitung ein
+	LDA _serSpecFlags
+	AND #_serSpecLine
+	BEQ _SPSAUS2L
+	
+	;Pin 0 wird, verwendet, lese Zustand ein
+	;Lösche zunächst das Zustands-Flag
+	LDA _serFlags
+	AND #_serDelCB1
+	STA _serFlags
+	
+	;Lese Zustand von Pin 0
+	LDA DRB
+	AND #_serSetCB1
+	ORA _serFlags
+	STA _serFlags
+	
+_SPSAUS2L:
+	;Pin 0 wird nicht als Eingang verwendet
+	
+	LDA _serFlags
+	LSR
+	;Weiter, wenn KP bereit ist
+	BCS _SPSAus2_1
+	TXA
+	;Warte, wenn X-Register = 0
+	BEQ _SPSAus2
+	
+	;Breche mit Fehlermeldung 3 ab
+	LDX #3
+	JMP _SPSAusEnde
+	
+_SPSAus2_1:
+	;KRITISCHER BEREICH
+	;BEGRÜNDUNG: Eine fallende Flanke würde in den Empf-
+	;Modus wechseln
+	SEI
+	
+	;Löse sofort einen IRQ beim Kommunikationspartner aus
+	;Schreibe also das Startbit auf die Leitung
+	LDA CRB
+	AND #_serCB2Del
+	STA CRB
+	
+	;Starte Timer
+	;Vorteiler an, IRQ-T aktivieren, Betriebsart 2
+	LDA #%10010010	
+	STA CMCR
+	LDA #_TimerLL
+	STA LL
+	LDA #_TimerUL
+	STA ULEC
+	
+	;Anzahl der zu übertragenen Bits setzen
+	;Startbit ist bereits gesetzt
+	;Nach Stopbit erfolgen noch zwei Abfragen:
+	;Abfrage auf 0, Abfrage Erfolg
+	;Zum Schluss muss noch auf Empf gewartet werden
+	;Daher insgesamt 13 Timer IRQs
+	LDA #_serPatternLen + 2
+	STA _serCountBits
+	
+	;Flag für Sendemodus setzen
+	LDA _serFlags
+	ORA #_serSndAct
+	
+	;Startbit, Stopbit, Parität, Fehlerkennung des Flagbytes setzen
+	;(nicht unbedingt notwendig)
+	AND #%00001111
+	ORA #_serStopbit
+	STA _serFlags
+	
+	;Ermittle Parität
+	TSX
+	LDA $0101, X
+	JSR _parity
+	
+	;Schiebe Paritätsbit nach Bit 6 des Flag-Bytes
+	TXA
+	LSR
+	ROR
+	LSR
+	ORA _serFlags
+	STA _serFlags
+	
+	;Lösche Puffer und dann 11-Bit Frame erzeugen
+	LDA #0
+	STA _serBuf
+	STA _serBuf + 1
+	
+	;Stopbit nach Frame
+	SEC
+	ROR _serBuf
+	
+	;Parität nach Frame
+	TXA	;Parität ist noch im X-Register
+	LSR
+	ROR _serBuf
+	
+	;Datenbits nach Frame
+	TSX
+	LDA $0101, X
+	LDX #8
+_SPSAus3:
+	ASL
+	ROR _serBuf
+	ROR _serBuf + 1
+	DEX
+	BNE _SPSAus3
+	
+	;Startbit wurde bereits geschrieben und muss nicht 
+	;in den Frame
+	
+	;ENDE KRITISCHER BEREICH
+	CLI
+	
+	;Warte solange bis (Miss-)Erfolg des Sendevorganges vorliegt
+	;Also 13 Timer-Durchläufe lang warten
+	;Abbrechen, wenn Fehler während der Übertragung auftritt
+_SPSAus4:
+
+	;KRITISCHER BREICH:
+	;Das Laden und Vergleichen von Count-Bits muss als atomare
+	;Aktion betrachtet werden. 
+	;Szenario: Nach dem Laden von _serCountBits wird ein IRQT
+	;ausgelöst und _serCountBits darin um eins dekrementiert.
+	;Der Anschließende Vergleich würde dementsprechend falsch
+	;ausgewertet. 
+	;Extremfall (wurde von uns beobachtet): Wird ein NACK gelesen
+	;werden, dann darf diese Schleife nicht verlassen werden, dies
+	;geschieht dennoch, da im X-Register der falsche Wert von
+	;_serCountBits steht (eins zu Viel)
+	SEI
+	LDX _serCountBits
+	CPX #2
+	
+	;Während Übertragung von Daten prüfen ob CB1 = 0
+	;Also bis nach dem Stopbit diese Leitung prüfen
+	BMI _SPSAus5
+	CLI
+	;ENDE KRITSCHER BEREICH
+
+	;Prüfe ob CB1 = 0 noch gilt
+	LDA _serFlags
+	AND #_serErrFlg
+	;Breche ab, wenn Fehler aufgetreten ist
+	BNE _SPSAus6	
+_SPSAus5:
+	CLI
+	;ENDE KRITSCHER BEREICH
+	;Prüfe Anzahl der Timer-Durchläufe
+	NOP
+	NOP
+	NOP
+	NOP
+	LDX _serCountBits
+	BNE _SPSAus4
+	
+_SPSAus6:
+	;Setze Sende-Leitung auf Idle
+	LDA CRB
+	ORA #_serCB2Set
+	STA CRB
+	
+	;Sendevorgang abgeschlossen, Flag-Byte anpassen
+	LDA _serFlags
+	AND #_serSndNAct
+	STA _serFlags
+	
+	;Stoppe den Timer
+	LDA #0
+	STA CMCR
+	
+	;Sichere Y-Register
+	TYA
+	PHA
+
+	LDY #200
+_SPSAus7:
+	;Warte die Zeit Y*Tw, (möglichst klein halten)
+	;Ermöglicht den ehemaligen Empfänger eine Übertragung
+
+	;Innere Schleife
+_SPSAus8:
+	NOP
+	NOP
+	NOP
+	DEX
+	BNE _SPSAus8
+
+	;Äußere Schleife
+	DEY
+	BNE _SPSAus7
+
+	;Lade Y-Register zurück
+	PLA
+	TAY
+	
+	;Lade Fehler-Bit ins X-Register (Bit 0)
+	LDA _serFlags
+	AND #_serErrFlg
+	ASL 
+	ROL
+	TAX
+	
+_SPSAusEnde:
+	PLA	;ursprüngliches Datenbyte zurücksichern
+	RTS
+;-------------------------------------------------------------------
+
+
+
+;===================================================================
+;User-Interrupt Routine
+;-----------------
+;Verwendung von Timer-Interrupts und IRQB dürfen vom Anwender NICHT! 
+;benutzt werden, da ansonsten die Kommunikation mit der SPS nicht 
+;mehr möglich ist!
+;===================================================================
+_USR_IRQ:
+	;Frage die Interruptquelle ab
+	;PRIORITÄT B > A IMPLEMENTIEREN
+	BIT SR			
+	BMI _IRQ_T		
+	BVS _IRQ_A
+	JMP _IRQ_B
+	
+;===================================================================
+;IRQ_A kann vom Anwender benutzt werden! Dazu muss jedoch der 
+;Zeiger UIRQAVek umgebogen werden! Der Anwender muss außerdem in 
+;seiner Subroutine als letzte Anweisung "JMP IRQAEnde" verwenden
+;===================================================================
+_IRQ_A:
+	LDA DRA
+	LDA UIRQAVek+1    ;Wenn UIRQAVek = 0, also noch nicht umgebogen, dann bei einem
+	ORA UIRQAVek       ;IRQA diesen quittieren!
+	BEQ IRQAEnde
+	JMP (UIRQAVek)
+
+IRQAEnde:
+	JMP IRQEnde
+	
+;==================================================================
+;===================================================================
+_IRQ_T:
+	
+	LDA SL	;Lösche UF-Bit
+		
+	;Prüfe ob Sendevorgang aktiv ist
+	LDA _serFlags
+	TAX
+	AND #_serSndAct
+	BNE _IRQ_T1
+	
+	;Prüfe, ob Empfangsvorgang aktiv ist
+	TXA
+	AND #_serRcvAct
+	BNE _IRQ_T2JMP
+	
+	;LDA #0
+	;STA CMCR
+	;JMP _IRQ_TEnde
+	;Sende- und Empfangsmodus sind nicht aktiv
+	;Springe in User-Interrupt-Routine
+	LDA UIRQTVek+1    ;Wenn UIRQAVek = 0, also noch nicht umgebogen, dann bei einem
+	ORA UIRQTVek       ;IRQA diesen quittieren!
+	BEQ IRQTEnde
+
+	JMP (UIRQTVek)
+	
+IRQTEnde:
+	JMP IRQEnde
+	
+	
+_IRQ_T2JMP:
+	;Empfangsvorgang ist aktiv, Springe also dort hin
+	JMP _IRQ_T2
+
+;===================================================================
+;Sende-Modus
+;===================================================================
+_IRQ_T1:
+	;Sendemodus ist aktiv
+	
+	;Wenn Pin 0 von PORT B verwendet wird, dann lese den aktuellen
+	;Zustand der Leitung ein
+	LDA _serSpecFlags
+	AND #_serSpecLine
+	BEQ _IRQ_TL1
+	
+	;Pin 0 wird, verwendet, lese Zustand ein
+	;Lösche zunächst das Zustands-Flag
+	LDA _serFlags
+	AND #_serDelCB1
+	STA _serFlags
+	
+	;Lese Zustand von Pin 0
+	LDA DRB
+	AND #_serSetCB1
+	ORA _serFlags
+	STA _serFlags
+		
+_IRQ_TL1:
+	;Dekrementiere Anzahl der Bits
+	LDX _serCountBits
+	DEX
+	STX _serCountBits
+	
+	;Abrage Leitung CB1 auf 0, bei IRQ 11
+	;Außerdem Leitung CB2 auf 0 setzen
+	CPX #2
+	BEQ _IRQ_T14
+	
+	;Abfrage Erfolg, bei T_IRQ 12
+	CPX #1
+	BEQ _IRQ_T15
+	
+	;Sofort Beenden, bei T_IRQ 13
+	TXA
+	BEQ _IRQ_T16
+	
+	;Leitung CB1 muss auf Null sein, sonst Fehler
+	LDA _serFlags
+	LSR
+	BCC _IRQ_T12
+	
+	;Fehler, Empfänger ist nicht mehr Empf.-Bereit
+	LDA _serFlags
+	ORA #_serErrFlg
+	STA _serFlags
+	JMP _IRQ_TEnde
+	
+_IRQ_T12:
+	;Ermittle nächstes Datenbit
+	ASL _serBuf + 1
+	ROL _serBuf
+	;Bit ist im Carry-Flag
+	
+	;Zunächst CB2 auf 0 setzen
+	LDA CRB
+	AND #_serCB2Del
+	BCC _IRQ_T13
+	;Setze Leitung, wenn Datenbit = 1
+	ORA #_serCB2Set		
+_IRQ_T13:
+	;Schreibe Datenbit auf die Leitung
+	STA CRB
+	JMP _IRQ_TEnde
+	
+_IRQ_T14:
+	;Prüfe, ob Leitung CB1 auf Null ist
+	
+	;Überprüfe CB1
+	LDA _serFlags
+	LSR
+	BCC _IRQ_T14_1	;Verzeige wenn CB1 = 0
+	
+	;Fehler: Setze FehlerFlag
+	LDA _serFlags
+	ORA #_serErrFlg
+	STA _serFlags
+	JMP _IRQ_TEnde
+
+_IRQ_T14_1:
+	;Setze Leitung CB2 auf Null, alles erfolgreich
+	LDA CRB
+	AND #_serCB2Del
+	STA CRB
+	JMP _IRQ_TEnde
+	
+_IRQ_T15:
+	;Überprüfe den Erfolg des Sendevorganges
+	LDA _serFlags
+	LSR
+	;Verzweige, wenn Übertragung erfolgreich
+	BCS _IRQ_T16
+	
+	;Fehler: Setze FehlerFlag
+	LDA _serFlags
+	ORA #_serErrFlg
+	STA _serFlags
+	JMP _IRQ_TEnde
+	
+_IRQ_T16:
+	;Bei letztem Timer IRQ sofort Beenden,
+	;der Sendevorgang ist abgeschlossen
+	JMP _IRQ_TEnde
+;-------------------------------------------------------------------
+	
+;===================================================================
+;Empfangsmodus
+;===================================================================	
+_IRQ_T2:
+	;Empfangsmodus ist aktiv	
+	
+	;Wenn Pin 0 von PORT B verwendet wird, dann lese den aktuellen
+	;Zustand der Leitung ein
+	LDA _serSpecFlags
+	AND #_serSpecLine
+	BEQ _IRQ_TL2
+	
+	;Pin 0 wird, verwendet, lese Zustand ein
+	;Lösche zunächst das Zustands-Flag
+	LDA _serFlags
+	AND #_serDelCB1
+	STA _serFlags
+	
+	;Lese Zustand von Pin 0
+	LDA DRB
+	AND #_serSetCB1
+	ORA _serFlags
+	STA _serFlags
+		
+_IRQ_TL2:	
+	;Prüfe Abtastzeitpunkt
+	LDX _serCountBits
+	BNE _IRQ_T3
+	
+	;Timer bei erstem Abtastzeitpunkt neu initialisieren
+	;Starte Timer neu mit normaler Abtastzeit
+	LDA #_TimerLL
+	STA LL
+	LDA #_TimerUL
+	STA ULEC
+	
+_IRQ_T3:
+	;Inkrementiere Anzahl an gelesenen Bits
+	;bzw. Anzahl der Timer-IRQs
+	INX
+	STX _serCountBits
+	
+	;Nachdem die Parität berechnet wurde, muss Erfolgskode
+	;auf die Leitung CB2 gelegt werden
+	CPX #_serPatternLen + 1
+	BEQ _IRQ_T4
+	
+	;Ganz zum Schluss muss wieder in Idle gewechselt werden
+	CPX #_serPatternLen + 2
+	BEQ _IRQ_T6
+	
+	;Lese Bit von der Leitung CB1
+	LDA _serFlags
+	LSR					;Schiebe Bit ins C-Flag
+	
+	ROR _serBuf			;Schiebe C-Flag nach buf
+	ROR _serBuf + 1
+	
+	;Wenn Anzahl = 11 erreicht, dann die Parität berechnen	
+	CPX #_serPatternLen
+	BEQ _IRQ_T7
+	
+	;Ansonsten Beenden
+	JMP _IRQ_TEnde		;BNE funktioniert hier nicht (Reichweite)
+
+_IRQ_T4:
+	;Leitung TxD des Senders sollte auf Null sein, sonst Fehler
+	LDA _serFlags
+	LSR
+	BCC _IRQ_T4L
+	
+	;Fehler, Leitung TxD des Sender ist gleich 1
+	LDA _serFlags
+	ORA #_serErrFlg
+	STA _serFlags
+	
+_IRQ_T4L:
+	;Lege Ergebnis auf CB2
+	LDA _serFlags
+	AND #_serErrFlg
+	
+	;Prüfe auf Fehler
+	BNE _IRQ_T5
+	;kein Fehler, Leitung CB2 geht auf 1
+	LDA CRB
+	ORA #_serCB2Set
+	STA CRB
+	
+_IRQ_T5:
+	;Fehler, Leitung CB2 bleibt auf 0
+	JMP _IRQ_TEnde
+
+_IRQ_T6:
+	;in Zustand Idle wechseln
+	LDA CRB
+	ORA #_serCB2Set
+	STA CRB
+	
+	;Stoppe Timer
+	LDA #0
+	STA CMCR
+	
+	;Flag für Empfangsmodus deaktivieren
+	LDA _serFlags
+	AND #_serRcvNAct
+	STA _serFlags
+	JMP _IRQ_TEnde
+	
+_IRQ_T7:
+	;Alle 11 Bits wurden bereits eingelesen
+	;Es bleibt ca. 1 Timer-Zyklus, um die Parität zu
+	;berechnen, sowie Start- bzw. Stopbit zu prüfen
+	;Außerdem muss an dieser Stelle der Wert in die
+	;FIFO eingetraegen werden
+		
+	;Lösche StartBit, StopBit, Parität und Fehlerkenn.
+	LDA _serFlags
+	AND #%00001111
+	
+	ASL _serBuf + 1
+	ROL _serBuf
+	;Stopbit befindet sich jetzt im C-Flag
+	
+	;Prüfe Wert des Stopbits
+	BCC _IRQ_T8
+	ORA #_serStopbit	;Stopbit = 1
+_IRQ_T8:
+	;Stopbit = 0
+	ASL _serBuf + 1
+	ROL _serBuf
+	;Parity befindet sich jetzt im C-Flag
+	;und das Datenbyte in "buf"
+	
+	;Prüfe Wert von Parität
+	BCC _IRQ_T9
+	ORA #_serParity	;Parität = 1
+_IRQ_T9:
+	;Parität = 0
+	ASL _serBuf + 1
+	;Starbit befindet sich jetzt im C-Flag
+	
+	;Prüfe Wert des Startbits
+	BCC _IRQ_T10
+	ORA #_serStartbit	;Startbit = 1
+_IRQ_T10:
+	;Startbit = 0
+	STA _serFlags ;Schreibe Flags weg
+	
+	;Berechne Parität
+	LDA _serBuf		;Lade Datenbyte
+	JSR _parity	;Ergebnis ist im X-Register
+	TXA
+	
+	;Rolle ParitätsBit nach Bit 6
+	LSR
+	ROR 
+	LSR
+	
+	EOR _serFlags		;Prüfe, ob Paritäten übereinstimmen
+	AND #%01110000		;Hinteren 4 Bits nicht relevant für Fehler
+	EOR #_serStopbit	;Prüfe, ob Stopbit = 1
+	
+	;Akku = 0 ->korrekt, 1-> Fehler
+	BEQ _IRQ_T11
+	LDA _serFlags
+	ORA #_serErrFlg
+	STA _serFlags
+	JMP _IRQ_TEnde
+	
+_IRQ_T11:
+	;Kein Fehler, _serFlg.serErrFlg bleibt auf 0
+	
+	;Schreibe das Byte in die FIFO
+	LDA _serBuf
+	JSR _writeFIFO
+	SEI		;_writeFIFO löscht das Flag
+	
+	;Prüfe ob Eintragung in FIFO erfolgreich war
+	TXA
+	BEQ _IRQ_TEnde ;Verzweige, wenn kein Fehler
+	
+	;Setze das Fehler-Flag im Status-Byte
+	LDA _serFlags
+	ORA #%10000000
+	STA _serFlags
+	JMP _IRQ_TEnde
+		
+_IRQ_TEnde:	
+	JMP IRQEnde
+;-------------------------------------------------------------------
+
+	
+;===================================================================
+;Die Leitung CB1 ist nur Ereignisgesteuert, es können also nur
+;Flanken gelesen werden. Der Status der Leitung muss daher nach
+;Flanke zwischengespeichert werden!
+;===================================================================
+_IRQ_B:
+	;IRQ-B quittieren
+	LDA DRB
+	
+	;Lösche Status-Bit der Leitung zunächst
+	LDA _serFlags
+	AND #_serDelCB1
+	TAX
+	
+	;Wenn Pin 0 von PORT B verwendet wird, dann muss keine
+	;Umparametrierung der wirksamen Flanke erfolgen
+	LDA _serSpecFlags
+	AND #_serSpecLine
+	BNE _IRQ_B1
+	
+	;Wahl der wirksamen Flanke invertieren
+	LDA CRB
+	EOR #_serCRB1Edge
+	STA CRB
+	AND #_serCRB1Edge
+	BNE _IRQ_B1		;Verzweige, wenn Status der Leitung CB1 == 0
+	
+	;Status der Leitung == 1
+	TXA
+	ORA #_serSetCB1
+	TAX
+	
+_IRQ_B1:
+	;CB1-Leitung ist 0
+	STX _serFlags
+	
+;_IRQ_B2:
+	;Prüfe, ob und wie Flanke interpretiert werden muss
+	;_serFlags ist noch im X-Register
+	
+	;Bedingung für Wechsel in den Empfangsmodus:
+	;(!SetCB1 & EmpfEn & !EmpfAct & !SndAct)
+	
+	;Prüfe, ob fallende Flanke
+	TXA
+	LSR
+	BCS _IRQ_B3
+
+;_IRQ_B2:
+	;Fallende Flanke, ggfs. weitere Schritte einleiten (in
+	;den Empfangsmodus wechseln)
+		
+	;Prüfe, ob Empfang erlaubt ist
+	LSR
+	BCC _IRQ_B4
+	
+	;Prüfe, ob Empfang aktiv ist
+	LSR
+	BCS _IRQ_B5
+	
+	;Prüfe ob Sendevorgang aktiv ist
+	LSR
+	BCS _IRQ_B6 
+	
+	TXA
+	;Initialisiere Empfangsmodus
+	ORA #_serRcvAct
+	STA _serFlags
+	
+	;Anzahl der empfangen Bits zurücksetzen
+	LDA #0
+	STA _serCountBits
+	
+	;Lösche Eingabe- / Ausgabepuffer
+	;STX _serBuf
+	
+	;IRQ-T aktivieren, Vorteiler an, Betriebsart 2
+	LDA #%10010010	
+	STA CMCR	
+	
+	;Initialisierie Timer mit halber Zeitkonstante
+	;und starte ihn
+	LDA #_TimerUL
+	LSR
+	PHA
+	
+	LDA #_TimerLL
+	ROR
+	STA LL
+
+	PLA
+	STA ULEC
+	
+	;Setze Leitung CB2 auf NULL (Bereitschaft anzeigen)
+	LDA CRB
+	AND #_serCB2Del
+	STA CRB
+_IRQ_B3:
+	;Empfangsmodus kann nicht gestartet werden, da nicht
+	;fallende Flanke
+_IRQ_B4:
+	;Empfang ist nicht erlaubt
+_IRQ_B5:
+	;Empfangsmodus ist aktiv
+_IRQ_B6:
+		;Sendemodus ist aktiv
+_IRQ_BEnde:
+	JMP IRQEnde
+;-------------------------------------------------------------------
+
+
+;===================================================================
+;Bildet die Parität des im Akku übergebenen Bytes. Das Ergebnis wird
+;im X-Register zurückgegeben. C-Äquivalent:
+;	while(x) { //Anzahl der gesetzten Bits bestimmen
+;		count++;
+;		x &= (x-1);
+;	}
+;	count &= 1;	//Parität bestimmen
+;===================================================================
+_parity:
+	PHA		;Sicherung, wird später zurückgeladen
+	PHA		;gleicher Wert, wird jedoch verändert
+	TSX
+	LDA #0
+	PHA		;Zähler für die Anzahl der gesetzten Bits
+	LDA $0101, X
+	BEQ _parity2
+_parity1:
+	INC $0100, X
+	DEC $0101, X
+	AND $0101, X
+	STA $0101, X
+	BNE _parity1
+_parity2:
+	PLA		;Anzahl der gesetzen Bits
+	AND #1	;Berechne Parität
+	TAX		;Rückgabewert
+	PLA		;Müll
+	PLA		;gesicherter Wert
+	RTS
+;-------------------------------------------------------------------
+	
+	
+;===================================================================		
+;Initialisiert die FIFO. 	
+;===================================================================
+_initFIFO:
+	;Verbiete Interrupts solange in dieser Funktion, um Fehler
+	;zu vermeiden
+	SEI
+	
+	;Initialisiere IN- und OUT-Offset
+	LDA #0
+	STA _fifoInOffs
+	STA _fifoOutOffs
+	
+	;FIFO ist leer
+	LDA #2
+	STA _fifoFlags
+	CLI
+	RTS
+;-------------------------------------------------------------------	
+
+
+;===================================================================	
+;Schreibt den im Akku übergeben Wert in die FIFO. Sollte
+;die FIFO voll sein, so wird eine Fehlercode im X-Register
+;zurückgegeben.
+;Rückgabewerte im X-Register:
+;	0 -> Fehlerfreie Ausführung
+;	1 -> FIFO voll, Eintragung nicht möglich
+;===================================================================
+_writeFIFO:	
+	;Verbiete IRQs, da im schlimmsten Fall beim Empfangsmodus
+	;gleichzeitig in die FIFO geschrieben wird und dies zu 
+	;Inkonsistenzen führen kann
+	SEI
+	
+	;Prüfe ob FIFO voll und breche ggfs. ab
+	LDX _fifoFlags
+	CPX #1
+	BEQ _writeFIFO2
+
+	;Schreibe Wert in FIFO
+	LDX _fifoInOffs
+	STA _fifo, X
+	
+	;Wert konnte erfolgreich geschrieben werden.
+	;Rückgabewert X-Register = 0
+	LDX #0
+	
+	;FIFO ist jetzt nicht mehr leer
+	STX _fifoFlags
+	
+	;Inkrementiere IN-Position
+	INC _fifoInOffs
+	
+	;Prüfe, ob Ende des Speicherbereiches erreicht
+	LDA _fifoInOffs
+	CMP #_fifoSize
+	BNE _writeFIFO1
+	
+	;Ende ist erreicht, daher In-Offset auf Startwert 0 setzen
+	STX _fifoInOffs
+	TXA
+	
+_writeFIFO1: 
+	;Prüfe ob FIFO voll, dh. IN = OUT
+	CMP _fifoOutOffs
+	BNE _writeFIFO2
+	
+	;FIFO voll, daher Flag setzen
+	LDA _fifoFlags
+	ORA #%00000001
+	STA _fifoFlags
+	;INC _fifoFlags ;sollte auch gehen
+	
+_writeFIFO2:
+	;Interrupts wieder erlauben
+	CLI	
+	RTS
+;-------------------------------------------------------------------	
+	
+;===================================================================	
+;Ließt einen Wert aus der FIFO und schreibt den Wert in den
+;Akku. Fehlerkennungen werden in das X-Register geschrieben
+;Rückgabewerte im X-Register:
+;	0 -> Konnte Wert erfolgreich aus der FIFO lesen
+;	1 -> FIFO ist leer, konnte keinen Wert entnehmen
+;===================================================================
+SPSEin:
+_readFIFO:
+	;Verbiete IRQs, da im schlimmsten Fall beim Empfangsmodus
+	;gleichzeitig in die FIFO geschrieben wird und dies zu 
+	;Inkonsistenzen führen kann
+	SEI
+	
+	;Breche ab, wenn Fifo leer ist
+	LDX _fifoFlags
+	CPX #2
+	BEQ _readFIFO3
+	
+	;Lese Wert aus Fifo und lege vorübergehend auf Stack
+	LDX _fifoOutOffs
+	LDA _fifo, X
+	PHA	
+	
+	;Inkrementiere Out-Position
+	INX 
+	STX _fifoOutOffs
+	
+	;FIFO ist nicht mehr Voll
+	LDA #0
+	STA _fifoFlags
+	
+	;Prüfe, ob Ende des Speicherbereiches erreicht
+	CPX #_fifoSize
+	BNE _readFIFO1
+	
+	;Ende ist erreicht, daher Out-Offset auf Startwert 0 setzen
+	TAX
+	STA _fifoOutOffs
+	
+_readFIFO1:
+	;Prüfe, ob FIFO leer ist, dh. IN = OUT
+	CPX _fifoInOffs
+	BNE _readFIFO2
+	
+	;FIFO ist leer, dh. Flag setzen
+	LDA _fifoFlags
+	ORA #%00000010
+	STA _fifoFlags
+	
+_readFIFO2:
+	LDX #1	;Rückgabewert 0
+	PLA		;Wert in Akku
+
+_readFIFO3:
+	DEX
+	CLI		;Erlaube ab hier wieder Interrupts
+	RTS
+;-------------------------------------------------------------------	
+
+;===================================================================	
+;Zählt die Anzahl der belegten Bytes in der FIFO und gibt das 
+;Ergebnis im Akkumulator zurück. 
+;Es werden keine Veränderungen der FIFO durchgeführt, Interrupts 
+;müssen hier also nicht gesperrt werden!
+;===================================================================
+_countFIFO:
+	SEC
+	LDA _fifoInOffs
+	SBC _fifoOutOffs
+	BCC _countFIFO1	;IN < OUT
+	BNE _countFIFO2	;IN > OUT
+	
+	;IN = OUT
+	LDA _fifoFlags
+	AND #2
+	BNE _countFIFO2 ;FIFO ist leer
+	
+	;FIFO ist voll	
+	CLC	
+_countFIFO1:
+	ADC #_fifoSize
+_countFIFO2:
+	RTS
+;-------------------------------------------------------------------
+	
+;===================================================================
+;Zählt die Anzahl an freien Bytes in der FIFO und gibt das Ergebnis
+;im Akkumulator zurück.
+;Es werden keine Veränderungen der FIFO durchgeführt, Interrupts 
+;müssen hier also nicht gesperrt werden!
+;===================================================================
+_countEmptyFIFO:
+	JSR _countFIFO	;ermittle Anzahl der belegten Bytes in der FIFO
+	SEC
+	SBC #_fifoSize
+	
+	;Zweierkomplement bilden. Es wird dadurch keine temporäre
+	;Variable benötigt
+	EOR #$FF
+	SEC
+	ADC #0
+	RTS
+;-------------------------------------------------------------------
+
+
+
+	.ORG progAddr + $04F0
+;===================================================================
+;Bit 0 -> Status Flag der Leitung CB1
+;	Annahme: zu Beginn = 1
+;Bit 1 -> Empfangsmodus erlaubt
+;Bit 2 -> Empfangsmodus aktiv
+;Bit 3 -> Sendemodus aktiv
+;Bit 4 -> StartBit
+;Bit 5 -> StopBit
+;Bit 6 -> Parität
+;Bit 7 -> Fehlerkennung
+_serFlags: 		.BYTE $01
+;===================================================================
+
+;===================================================================
+;Spezielle Flags:
+;Bit 0 -> Empfang über die Leitung 0 des Port B erlauben
+_serSpecFlags:	.BYTE $00
+;===================================================================
+
+_serCountBits: .BYTE $00
+_serBuf:	.WORD $0000	
+
+;===================================================================
+	.ORG _fifoAddr
+_fifo: 			.BYTE $00
+
+	.ORG _fifoAddr + _fifoSize
+;Flags:
+;Bit 0: FIFO ist voll
+;Bit 1: FIFO ist leer
+_fifoFlags:		.BYTE $00
+_fifoInOffs: 	.BYTE $00
+_fifoOutOffs: 	.BYTE $00
+;===================================================================

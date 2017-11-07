@@ -1,0 +1,8 @@
+Log File für Fehler in PDL - Dateien
+                 
+Abschnitt für Meldungen beim Speichern von Bildern:
+
+Projekt "\\TDIP1VM\WinCC60_Project_MOS_SPS\MOS_SPS.mcp"
+-----------------------------------------------------------
+29.10.2009 15:40 Es wurden beim Speichern ungültige Objektverweise im Bild "Kopf.Pdl" gefunden. 
+                 Das Objekt "Button12" referenziert das unbekannte Objekt "PictureWindowYesNo" bei einer Direktverbindung.  

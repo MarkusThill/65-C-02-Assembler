@@ -1,0 +1,316 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)\r\n"
+    "LANGUAGE 7, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\SerMosSPS.rc2""  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen\r\n"
+    "#include ""l.DEU\\afxres.rc""      // Standardkomponenten\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\SerMosSPS.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Info über SerMosSPS"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    LTEXT           "SerMosSPS, Version 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2010",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_SERMOSSPS_DIALOG DIALOGEX 0, 0, 460, 300
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "  "
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Beenden",IDCANCEL,6,281,50,14
+    PUSHBUTTON      "Teste Timer",IDC_BUTTON1,219,24,94,14
+    GROUPBOX        "Schnittstelle",IDC_STATIC,14,15,71,62
+    CONTROL         "COM 1",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,27,37,10
+    CONTROL         "COM 2",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,20,38,37,10
+    CONTROL         "COM 3",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,20,51,37,10
+    CONTROL         "COM 4",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,20,62,37,10
+    PUSHBUTTON      "Verbinden",IDC_BUTTON2,14,79,71,14
+    LTEXT           "Durchschnitliche Abweichung",IDC_STATIC,219,39,93,8
+    EDITTEXT        IDC_EDIT1,217,50,95,14,ES_MULTILINE | ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Teste ThreadTimer",IDC_BUTTON3,217,68,95,14
+    EDITTEXT        IDC_EDIT2,217,92,95,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Durchschnitliche Abweichung",IDC_STATIC,219,84,93,8
+    PUSHBUTTON      "Trennen",IDC_BUTTON4,14,93,71,14
+    EDITTEXT        IDC_EDIT3,15,108,69,30,ES_MULTILINE | ES_AUTOHSCROLL | WS_DISABLED
+    GROUPBOX        "Timer Tests",IDC_STATIC,211,15,106,101
+    CONTROL         "Empfangsfreigabe",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,104,25,74,10
+    PUSHBUTTON      "Sende TestByte",IDC_BUTTON5,100,62,95,14
+    PUSHBUTTON      "Lese ein FIFO-Byte",IDC_BUTTON6,103,206,92,14
+    GROUPBOX        "FIFO-Empfangspuffer",IDC_STATIC,96,145,106,94
+    PUSHBUTTON      "Lese gesamte FIFO",IDC_BUTTON7,103,174,92,14
+    COMBOBOX        IDC_COMBO1,106,158,89,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Sende Testfolge",IDC_BUTTON8,100,76,95,14
+    PUSHBUTTON      "Lösche Sende-FIFO",IDC_BUTTON9,100,106,95,14
+    PUSHBUTTON      "Lösche Empfangs-FIFO",IDC_BUTTON11,103,190,92,14
+    CONTROL         "SendeFreigabe",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,104,36,73,10
+    GROUPBOX        "Senden",IDC_STATIC,95,51,106,88
+    GROUPBOX        "Freigaben",IDC_STATIC,95,15,105,35
+    PUSHBUTTON      "Sende Byte (Dez)",IDC_BUTTON10,100,91,68,14
+    EDITTEXT        IDC_EDIT4,169,91,24,14,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Statistiken etc.",IDC_STATIC,212,121,211,94
+    CONTROL         "Sendevorgang aktiv",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,219,132,80,10
+    CONTROL         "Empfangsvorgang aktiv",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,219,144,91,10
+    LTEXT           " Gesendete Bytes",IDC_STATIC,219,156,93,11,WS_BORDER
+    EDITTEXT        IDC_EDIT5,219,168,50,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Reset",IDC_BUTTON12,273,168,40,14
+    LTEXT           " Empfangene Bytes",IDC_STATIC,219,184,93,11,WS_BORDER
+    EDITTEXT        IDC_EDIT6,219,196,50,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Reset",IDC_BUTTON13,273,196,40,14
+    LTEXT           " Sendefehler",IDC_STATIC,323,156,93,11,WS_BORDER
+    EDITTEXT        IDC_EDIT7,323,168,50,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Reset",IDC_BUTTON14,377,168,40,14
+    LTEXT           " Empfangsfehler",IDC_STATIC,324,184,93,11,WS_BORDER
+    EDITTEXT        IDC_EDIT8,324,196,50,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Reset",IDC_BUTTON15,378,196,40,14
+    GROUPBOX        "Weitere Optionen / Daten",IDC_STATIC,321,15,101,101
+    LTEXT           " Max. Sendewiederholungen",IDC_STATIC,326,25,93,11,WS_BORDER
+    EDITTEXT        IDC_EDIT9,326,50,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Ändern",IDC_BUTTON16,369,49,50,14,WS_DISABLED
+    CONTROL         "Unendlich",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,327,39,47,10
+    LTEXT           " Letzter Fehler",IDC_STATIC,324,128,93,11,WS_BORDER
+    EDITTEXT        IDC_EDIT10,340,140,77,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Zuletzt ges. Byte",IDC_STATIC,327,68,56,8
+    LTEXT           "Zuletzt empf. Byte",IDC_STATIC,326,87,60,8
+    EDITTEXT        IDC_EDIT11,388,66,27,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_EDIT12,388,84,27,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_EDIT13,324,140,15,14,ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,225,241,8,10
+    CONTROL         "",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,247,241,8,10
+    CONTROL         "",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,259,241,8,10
+    CONTROL         "",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,271,241,8,10
+    CONTROL         "",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,283,241,8,10
+    CONTROL         "",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,295,241,8,10
+    CONTROL         "",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,307,241,8,10
+    CONTROL         "",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,319,241,8,10
+    CONTROL         "",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,331,241,8,10
+    CONTROL         "",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,343,241,8,10
+    CTEXT           "IDLE",IDC_STATIC,221,231,16,8
+    LTEXT           "ST",IDC_STATIC,247,231,9,8
+    LTEXT           "D0",IDC_STATIC,259,231,10,8
+    LTEXT           "D1",IDC_STATIC,271,231,10,8
+    LTEXT           "D2",IDC_STATIC,283,231,10,8
+    LTEXT           "D3",IDC_STATIC,295,231,10,8
+    LTEXT           "D4",IDC_STATIC,307,231,10,8
+    LTEXT           "D5",IDC_STATIC,319,231,10,8
+    LTEXT           "D6",IDC_STATIC,331,231,10,8
+    LTEXT           "D7",IDC_STATIC,343,231,10,8
+    CTEXT           "P",IDC_STATIC,355,231,8,8
+    CONTROL         "",IDC_CHECK16,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,355,241,8,10
+    CONTROL         "",IDC_CHECK17,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,367,241,8,10
+    CONTROL         "",IDC_CHECK18,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,379,241,8,10
+    CTEXT           "SP",IDC_STATIC,367,231,8,8
+    CTEXT           "W",IDC_STATIC,379,231,8,8
+    CTEXT           "F",IDC_STATIC,391,231,10,8
+    CONTROL         "",IDC_CHECK19,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,391,241,8,10
+    LTEXT           "SW",IDC_STATIC,403,231,10,8
+    CONTROL         "0",IDC_CHECK20,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,403,241,8,10
+    CTEXT           "IDLE",IDC_STATIC,421,231,16,8
+    PUSHBUTTON      "Sende Test-Frame",IDC_BUTTON17,221,271,73,14
+    LTEXT           "Verhalten des Empfängers:",IDC_STATIC,225,250,88,8
+    CONTROL         "",IDC_CHECK22,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,247,260,8,10
+    CONTROL         "",IDC_CHECK23,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,259,260,8,10
+    CONTROL         "",IDC_CHECK24,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,271,260,8,10
+    CONTROL         "",IDC_CHECK25,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,283,260,8,10
+    CONTROL         "",IDC_CHECK26,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,295,260,8,10
+    CONTROL         "",IDC_CHECK27,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,307,260,8,10
+    CONTROL         "",IDC_CHECK28,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,319,260,8,10
+    CONTROL         "",IDC_CHECK29,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,331,260,8,10
+    CONTROL         "",IDC_CHECK30,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,343,260,8,10
+    CONTROL         "",IDC_CHECK31,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,355,260,8,10
+    CONTROL         "",IDC_CHECK32,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,367,260,8,10
+    CONTROL         "",IDC_CHECK33,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,379,260,8,10
+    CONTROL         "",IDC_CHECK34,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,391,260,8,10
+    CONTROL         "",IDC_CHECK21,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,425,241,8,10
+    CONTROL         "0",IDC_CHECK35,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,403,260,8,10
+    GROUPBOX        "Testframe senden",IDC_STATIC,211,220,231,72
+    CONTROL         "",IDC_CHECK36,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,19,153,11,10
+    CONTROL         "",IDC_CHECK37,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,20,166,11,10
+    GROUPBOX        "Zustände",IDC_STATIC,15,144,71,35
+    LTEXT           "TxD",IDC_STATIC,32,153,14,8
+    LTEXT           "RxD",IDC_STATIC,33,166,14,8
+    CONTROL         "0",IDC_CHECK38,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,423,260,8,10
+    EDITTEXT        IDC_EDIT14,154,221,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_EDIT15,155,121,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "FIFO-Größe",IDC_STATIC,104,123,39,8
+    LTEXT           "FIFO-Größe",IDC_STATIC,108,223,39,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704e4"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Firmenname>"
+            VALUE "FileDescription", "TODO: <Dateibeschreibung>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "SerMosSPS.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Firmenname>. Alle Rechte vorbehalten."
+            VALUE "OriginalFilename", "SerMosSPS.exe"
+            VALUE "ProductName", "TODO: <Produktname>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_SERMOSSPS_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 453
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 295
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&Info über SerMosSPS..."
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE 7, 1
+#pragma code_page(1252)
+#include "res\SerMosSPS.rc2"  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen
+#include "l.DEU\afxres.rc"      // Standardkomponenten
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,17 @@
+Nummer,Parameter,Klasse,Art,TextID 1,TextID 2,TextID 3,TextID 4,TextID 5,TextID 6,TextID 7,TextID 8,TextID 9,TextID 10,Block: 1,Block: 2,Block: 3,Block: 4,Block: 5,Block: 6,Block: 7,Block: 8,Block: 9,Block: 10,Prozesswert 1,Prozesswert 2,Prozesswert 3,Prozesswert 4,Prozesswert 5,Prozesswert 6,Prozesswert 7,Prozesswert 8,Prozesswert 9,Prozesswert 10,MeldeVariable,MeldeBit,Quittiervariable,Quittierbit,Zustandsvariable,Zustandsbit,AG - Nummer,AG - Subnummer,Infotext,Aktionstyp,Funktionsname,Bildname,NormierDll,Gruppenkennung,Gruppenname,Ausblendmaske,Erzeugerkennung,Priorität,1 
+1,4,1,1,74,0,0,0,0,0,0,0,0,0,Fehler: Soll- Istabweichung bei der Anzahl der Empfangsdaten, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,0, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+2,4,1,1,75,0,0,0,0,0,0,0,0,0,Fehler: Empfangsspeicher ist voll, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,1, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+3,4,1,1,76,0,0,0,0,0,0,0,0,0,Fehler: Paritätsfehler beim Empfang, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,2, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+4,4,1,1,78,0,0,0,0,0,0,0,0,0,Fehler: Time Out Telegramm von µP-Steuerung, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,3, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+5,4,1,1,79,0,0,0,0,0,0,0,0,0,Fehler: Kommunikation mit Level 1 SPS gestört, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,4, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+6,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,5, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+7,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,6, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+8,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_001_008,7, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+9,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,0, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+10,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,1, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+11,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,2, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+12,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,3, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+13,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,4, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+14,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,5, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+15,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,6, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0
+16,4,1,1,77,0,0,0,0,0,0,0,0,0,Fehler: Reserve, , , , , , , , , , , , , , , , , , , ,PLC_Alarm_009_016,7, ,0, ,0,0,0, ,0, , , ,0, ,0x0,0,0

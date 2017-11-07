@@ -1,0 +1,331 @@
+[Version-Number]
+SV.06.02.00.03
+
+
+[First-Level-Provider]
+INS=
+INSINFO=
+INSINFO2=
+IVAR2=
+IRTO=
+IASO=
+IArchive=
+IText=
+IAlarmData=
+ICCDMRT=
+IHIERARCHY=
+IOPTIONS=
+ICSIG=
+IArchiveControl=
+IUABasic=
+ITagTable=
+INSINFO2ALG=
+INSINFO2TLG=
+IEVENT=
+
+
+;******************************************************************
+; INS provider
+;******************************************************************
+
+[INS-First]
+IID={47838AA5-41EA-11D0-B59B-0020AFBE27D7}
+Server = @RTONS
+Default=
+
+[INS-Second]
+
+
+;******************************************************************
+; INSInfo provider
+;******************************************************************
+
+[INSINFO-First]
+IID={47838AA5-41EA-11D0-B59B-0020AFBE27D8}
+Server = @RTONS
+Default=
+
+[INSINFO-Second]
+
+
+;******************************************************************
+; INSInfo2 provider
+;******************************************************************
+
+[INSINFO2-First]
+Server= @Siemens.INSInf2Mx
+IID = {47838A74-41EA-11D0-B59B-0020AFBE27D7}
+Default =
+
+[INSINFO2-Second]
+
+
+;******************************************************************
+; INSINFO2ALG provider
+;******************************************************************
+
+[INSINFO2ALG-First]
+Server= @Siemens.INSInf2Mx
+IID = {47838A74-41EA-11D0-B59B-0020AFBE27D7}
+Default =
+
+[INSINFO2ALG-Second]
+
+
+;******************************************************************
+; INSINFO2TLG provider
+;******************************************************************
+
+[INSINFO2TLG-First]
+Server= @Siemens.INSInf2Mx
+IID = {47838A74-41EA-11D0-B59B-0020AFBE27D7}
+Default =
+
+[INSINFO2TLG-Second]
+
+
+;******************************************************************
+; IVar provider
+;******************************************************************
+
+[IVAR2-First]
+IID={23EBEDE0-BD9B-11D1-BD5A-0080C7F7898A}
+Server = @Simatic.IVarMx.1
+
+[IVAR2-Second]
+
+
+;******************************************************************
+; IRTO provider
+;******************************************************************
+[IRTO-First]
+IID={47838A50-41EA-11D0-B59B-0020AFBE27D0}
+Server = @RTONS
+
+[IRTO-Second]
+
+
+;******************************************************************
+; IASO provider
+; This are only dummy values
+;******************************************************************
+
+[IASO-First]
+IID={63A87800-23D9-11d3-9026-0080C70ACEA7}
+Server = @WinCC.Not.Used.1
+
+[IASO-Second]
+
+
+;******************************************************************
+; IArchive provider
+;******************************************************************
+
+[IArchive-First]
+IID={2179ABD3-9621-11D1-B57D-00A0241CD963}
+Server = @ScIArchiveMx.ScIArchiveMx.1
+
+[IArchive-Second]
+
+
+;******************************************************************
+; IText
+;******************************************************************
+
+[IText-First]
+IID={713E052E-9D3A-11D1-924A-0020AFCB5B70}
+Server = @Simatic.ITextMx.1
+
+[IText-Second]
+
+
+;******************************************************************
+; IAlarmData
+;******************************************************************
+
+[IAlarmData-First]
+IID={E2B3D910-A6A4-11D1-829A-00A0C9109A01}
+Server = @Simatic.IAlarmDataMx.1
+
+[IAlarmData-Second]
+
+
+;******************************************************************
+; ICCDmRt provider
+;******************************************************************
+
+[ICCDMRT-First]
+IID={F0928140-4603-11D1-AE59-006097662572}
+Server = @WinCC.CCDmRtMx.1
+
+[ICCDMRT-Second]
+
+
+;******************************************************************
+; IHierarchy provider
+;******************************************************************
+
+[IHIERARCHY-First]
+IID={823576D7-FC6E-11d1-996A-0060085D39EC}
+Server = @WinCC.CCHierarchySrv.1
+
+[IHIERARCHY-Second]
+
+
+;******************************************************************
+; IOptions provider
+;******************************************************************
+
+[IOPTIONS-First]
+IID={F0084793-BE5F-11D1-BDD4-0060085D395F}
+Server = @WinCC.CCCfgAsoRw.1
+
+[IOPTIONS-Second]
+
+
+;******************************************************************
+; ICSig provider
+;******************************************************************
+
+[ICSIG-First]
+IID={77C294A1-1FD5-11d2-983F-0060085D48B9}
+Server = @WinCC.CCCSigMx.1
+
+[ICSIG-Second]
+
+
+;******************************************************************
+; IArchiveControl provider
+;******************************************************************
+
+[IARCHIVECONTROL-First]
+IID={E055C7F3-D55B-11D2-94ED-00105AB05613}
+Server = @WinCC.CArchiveControl.1
+
+[IARCHIVECONTROL-Second]
+
+
+;******************************************************************
+; IUABasic provider
+;******************************************************************
+
+[IUABasic-First]
+IID={0F6EAA35-F312-11D2-8717-0060087315EF}
+Server = @ScIUaBasicMx.ScIUaBasicMx.1
+
+[IUABasic-Second]
+
+
+;******************************************************************
+; ITagTable provider
+;******************************************************************
+
+[ITagTable-First]
+IID={A7C6FA21-9333-11D2-B5E7-00A02450CEB6}
+Server = @WinCC.CCTTMx.1
+
+[ITagTable-Second]
+
+
+;******************************************************************
+; IEVENT provider
+;******************************************************************
+
+[IEVENT-First]
+IID={DFD46CF1-D79B-11d2-A48D-00609709E40B}
+Server = @SCSIEventDHX.IEventDH.1
+
+[IEVENT-Second]
+
+
+;******************************************************************
+; Distribution of the servers to their host
+;******************************************************************
+
+[ServerHosts]
+Server1=@RTONS						localhost
+Server2=@Simatic.IVarMx.1				localhost
+Server3=@ScIArchiveMx.ScIArchiveMx.1			localhost
+Server4=@Simatic.ITextMx.1				localhost
+Server5=@Simatic.IAlarmDataMx.1				localhost
+Server6=@WinCC.CCDmRtMx.1				localhost
+Server7=@WinCC.Not.Used.1				localhost
+Server8=@WinCC.CCHierarchySrv.1				localhost
+Server9=@WinCC.CCCfgAsoRw.1				localhost
+Server10=@WinCC.CCCSigMx.1				localhost
+Server11=@WinCC.CArchiveControl.1			localhost
+Server12=@ScIUaBasicMx.ScIUaBasicMx.1			localhost
+Server13=@Siemens.INSInf2Mx				localhost
+Server14=@WinCC.CCTTMx.1				localhost
+Server15=@SCSIEventDHX.IEventDH.1			localhost
+Server17=<?XML><Cfg><ProgId>WinCC.AlgNSInfo2.1</ProgId><Prj></Prj><Red>!WinCC!</Red></Cfg> TDIP26VM
+Server16=<?XML><Cfg><ProgId>WinCC.DmNSInfo.1</ProgId><Prj></Prj><Srv>WITHPACKAGES</Srv><Red>!WinCC!</Red></Cfg> TDIP26VM
+Server19=<?XML><Cfg><ProgId>WinCC.EventServer.1</ProgId><Prj></Prj></Cfg> TDIP26VM
+Server18=<?XML><Cfg><ProgId>WinCC.TlgNSInfo2.1</ProgId><Prj></Prj><Red>!WinCC!</Red></Cfg> TDIP26VM
+
+
+;******************************************************************
+; Redundancy of hosts
+;******************************************************************
+
+[RedundantHosts]
+
+
+;******************************************************************
+; Distribution of hosts
+;******************************************************************
+
+[DistributionHosts]
+
+
+;******************************************************************
+; server prefixes
+;******************************************************************
+
+[INS-Prefix]
+
+[INSINFO-Prefix]
+
+[INSINFO2-Prefix]
+Prefix1=@LocalMachine:: <?XML><Cfg><ProgId>WinCC.DmNSInfo.1</ProgId><Prj></Prj><Srv>WITHPACKAGES</Srv><Red>!WinCC!</Red></Cfg>
+
+[INSINFO2ALG-Prefix]
+Prefix1=@LocalMachine:: <?XML><Cfg><ProgId>WinCC.AlgNSInfo2.1</ProgId><Prj></Prj><Red>!WinCC!</Red></Cfg>
+
+[INSINFO2TLG-Prefix]
+Prefix1=@LocalMachine:: <?XML><Cfg><ProgId>WinCC.TlgNSInfo2.1</ProgId><Prj></Prj><Red>!WinCC!</Red></Cfg>
+
+[IVAR2-Prefix]
+
+[IRTO-Prefix]
+
+[IASO-Prefix]
+
+[IArchive-Prefix]
+
+[IText-Prefix]
+
+[IAlarmData-Prefix]
+
+[ICCDmRt-Prefix]
+
+[IHIERARCHY-Prefix]
+
+[IOptions-Prefix]
+
+[ICSIG-Prefix]
+
+[IArchiveControl-Prefix]
+
+[IUABasic-Prefix]
+
+[ITagTable-Prefix]
+
+[IEVENT-Prefix]
+Prefix1=@LocalMachine:: <?XML><Cfg><ProgId>WinCC.EventServer.1</ProgId><Prj></Prj></Cfg>
+
+[Digest-Section]
+Signature = 857C69B5F8642357C449B57C9E674F8D4BC14AA614E439C6529806720CF0D2D2499C50627B38B2CCBD209F20F812D6F46B8AB44A0C06996B400796C7A96EFA77
+PublicKey = 06020000002400005253413100020000010001005354A2F4049861F9C3DB65779B54020815D8892F035271490443AF4CEE0FCB422C6531DD6588FACCCD47EAB525F4EBE60152FD0EEE28ACD159929A6CB1F93AAE
+
+

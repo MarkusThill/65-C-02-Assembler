@@ -1,0 +1,4 @@
+
+ 1.0 Start Programm VEX: VAR_EXIM.EXE 13:52:25
+ 4.2 IMPORT VARIABLES 
+ 5.0 End Programm: VAR_EXIM.EXE 13:52:28

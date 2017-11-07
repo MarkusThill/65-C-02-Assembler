@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CAboutDlg" Collapsed="true">
+    <Position X="10.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAhBAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>SerMosSPSDlg.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Com">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAEACAEgQCAQAEAAAAEAAQAIIEAQBAKAAAAkAARgAA=</HashCode>
+      <FileName>Com.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ComPort">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIEAGAgAAAEQUCAIEAJAgAEABgCQAAYIACABAAAABA=</HashCode>
+      <FileName>ComPort.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ComThread">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>CViHAERA0gvAwRFAAARCAimNURIDGxQQMERIEGGAoEo=</HashCode>
+      <FileName>ComThread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSerMosSPSApp" Collapsed="true">
+    <Position X="9.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAQAQAAAAAAAAAA=</HashCode>
+      <FileName>SerMosSPS.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSerMosSPSDlg" Collapsed="true">
+    <Position X="9.75" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="CSerMosSPSDlg::__unnamed_006b_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SerMosSPSDlg.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>EACAAAEQBACAAP8IApBAAQAAAAAAkAQAQEAEIAARQCA=</HashCode>
+      <FileName>SerMosSPSDlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Stat">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAgAAEIAEAIAAAAAAgQAAAgEEQQACABCEgIAAFAAIAA=</HashCode>
+      <FileName>Stat.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestTimer">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AoAAAAIARAwQEABCoAAgEAABgAAAEAQAQBQAMACBAiA=</HashCode>
+      <FileName>TestTimer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ThreadTimer" Collapsed="true">
+    <Position X="9.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQIAAAAAAABAAAAQAgAAAAAAAAQAAAEAAABAAAI=</HashCode>
+      <FileName>ThreadTimer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
