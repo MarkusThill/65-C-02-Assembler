@@ -12,7 +12,7 @@ I made the following notes before writing the program:
 - Write an initialization-routine that copies the sudoku-problem into a new
 array and then solves for the copied array.
 - Write a recursive function solve. In this method a backtracking algorithm
-is implemented that tries all different possible values for the empty cells
+is implemented that tries all different possible values for the empty cells
 until a solution is found.
 - Write a subroutine that checks if the current board is legal and use this
 method in solve.
