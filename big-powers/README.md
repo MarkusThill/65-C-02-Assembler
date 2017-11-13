@@ -9,6 +9,6 @@ x^4=x^2*x^2
 x^8=x^4*x^4
 
 And so on.
-This method makes it possible to efficiently calculate even big powers. Even the 6502 will be able to calculate the result in a very short time!
-To realize the power-function you I first had to to implement a 128 byte multiplication-routine and a square-routine that calculates the power of 2. With these two functions it was fairly easy to implement the powers-function.
+This method makes it possible to efficiently calculate very big powers. Even the 6502 with a low clocking will be able to calculate the result in a very short time!
+To realize the power-function I first had to to implement a 128 byte multiplication-routine and a square-routine that calculates the power of 2. With these two functions it was fairly easy to implement the powers-function.
 To check the results I wrote a JAVA-program that uses the BigInteger-class.
