@@ -1,12 +1,12 @@
-; Berechnet Potenzen x^n mit einem Ergebnis bis zu 128 Byte
-; Größe. Dabei wird folgendes Schema angewandt:
+; Computes powers x^n with results of size up to 128 bytes.
+; The following scheme is used:
 ; x^2=x*x
 ; x^4 = (x^2)*(x^2)
 ; x^8 = (x^4)*(x^4)
-; Beispiel:
+; Example:
 ; 	x^63 = (x^32)*(x^16)*(x^8)*(x^4)*(x^2)*x
-; 	Dies erfordert nur 5+5=10 Multipliaktionen, normalerweise
-;	wären 62 Multiplikationen erforderlich.
+; 	This requires 5+5=10 multiplications, usually
+;	62 multiplications would be necessary.
 numBytes = 128 ;max is 128
 
 ; Pointer
